@@ -316,18 +316,6 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
         public VelocitiesBlock velocities = new VelocitiesBlock();
     }
 
-    public static class VelocitiesSampleIntervalBlock
-    {
-        public int intvl0_ms;
-        public int intvl1_ms;
-        public int intvl2_ms;
-        public int intvl3_ms;
-        public int intvl4_ms;
-        public int intvl5_ms;
-        public int intvl6_ms;
-        public int intvl7_ms;
-    }
-
     /**
      * Read a single encoder from the OctoQuad
      * @param idx the index of the encoder to read
@@ -695,21 +683,26 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
      * Set the velocity sample intervals for all encoders
      * @param intvls the sample intervals in milliseconds
      */
-    public void setAllVelocitySampleIntervals(VelocitiesSampleIntervalBlock intvls)
+    public void setAllVelocitySampleIntervals(int[] intvls)
     {
         verifyInitialization();
 
-        Range.throwIfRangeIsInvalid(intvls.intvl0_ms, 0, 255);
-        Range.throwIfRangeIsInvalid(intvls.intvl1_ms, 0, 255);
-        Range.throwIfRangeIsInvalid(intvls.intvl2_ms, 0, 255);
-        Range.throwIfRangeIsInvalid(intvls.intvl3_ms, 0, 255);
-        Range.throwIfRangeIsInvalid(intvls.intvl4_ms, 0, 255);
-        Range.throwIfRangeIsInvalid(intvls.intvl5_ms, 0, 255);
-        Range.throwIfRangeIsInvalid(intvls.intvl6_ms, 0, 255);
-        Range.throwIfRangeIsInvalid(intvls.intvl7_ms, 0, 255);
+        if(intvls.length != NUM_ENCODERS)
+        {
+            throw new IllegalArgumentException("intvls.length != 8");
+        }
 
-        byte[] dat = new byte[] {(byte)intvls.intvl0_ms, (byte)intvls.intvl1_ms, (byte)intvls.intvl2_ms, (byte)intvls.intvl3_ms,
-                (byte)intvls.intvl4_ms, (byte)intvls.intvl5_ms, (byte)intvls.intvl6_ms, (byte)intvls.intvl7_ms};
+        for(int i : intvls)
+        {
+            Range.throwIfRangeIsInvalid(i, 0, 255);
+        }
+
+        byte[] dat = new byte[intvls.length];
+
+        for(int i = 0; i < intvls.length; i++)
+        {
+            dat[i] = (byte) intvls[i];
+        }
 
         writeContiguousRegisters(Register.ENCODER_0_VELOCITY_SAMPLE_INTERVAL, Register.ENCODER_7_VELOCITY_SAMPLE_INTERVAL, dat);
     }
@@ -732,11 +725,10 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     }
 
     /**
-     * Reads all velocity sample intervals from the OctoQuad, writing the data into
-     * an existing {@link VelocitiesSampleIntervalBlock} object. The previous values are destroyed.
-     * @param out the {@link VelocitiesSampleIntervalBlock} object to fill with new data
+     * Reads all velocity sample intervals from the OctoQuad
+     * @return all velocity sample intervals from the OctoQuad
      */
-    public void readAllVelocitySampleIntervals(VelocitiesSampleIntervalBlock out)
+    public int[] readAllVelocitySampleIntervals()
     {
         verifyInitialization();
 
@@ -744,27 +736,14 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         buffer.order(OCTOQUAD_ENDIAN);
 
-        out.intvl0_ms = buffer.get() & 0xFF;
-        out.intvl1_ms = buffer.get() & 0xFF;
-        out.intvl2_ms = buffer.get() & 0xFF;
-        out.intvl3_ms = buffer.get() & 0xFF;
-        out.intvl4_ms = buffer.get() & 0xFF;
-        out.intvl5_ms = buffer.get() & 0xFF;
-        out.intvl6_ms = buffer.get() & 0xFF;
-        out.intvl7_ms = buffer.get() & 0xFF;
-    }
+        int[] ret = new int[NUM_ENCODERS];
 
-    /**
-     * Reads all velocity sample intervals from the OctoQuad
-     * @return a {@link VelocitiesSampleIntervalBlock} object with the new data
-     */
-    public VelocitiesSampleIntervalBlock readAllVelocitySampleIntervals()
-    {
-        verifyInitialization();
+        for(int i = 0; i < NUM_ENCODERS; i++)
+        {
+            ret[i] = buffer.get() & 0xFF;
+        }
 
-        VelocitiesSampleIntervalBlock block = new VelocitiesSampleIntervalBlock();
-        readAllVelocitySampleIntervals(block);
-        return block;
+        return ret;
     }
 
     /**
