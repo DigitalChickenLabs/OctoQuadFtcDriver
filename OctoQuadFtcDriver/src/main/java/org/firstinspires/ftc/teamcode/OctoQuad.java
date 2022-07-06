@@ -547,7 +547,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     public void resetAllEncoders()
     {
         verifyInitialization();
-        writeContiguousRegisters(Register.COMMAND, Register.COMMAND_DAT_1, new byte[] {CMD_RESET_ENCODERS, (byte)255});
+        writeContiguousRegisters(Register.COMMAND, Register.COMMAND_DAT_1, new byte[] {CMD_RESET_ENCODERS, (byte)0xFF});
     }
 
     /**
@@ -641,14 +641,14 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     {
         verifyInitialization();
 
-        if(reverse.length != 8)
+        if(reverse.length != NUM_ENCODERS)
         {
             throw new IllegalArgumentException("reverse.length != 8");
         }
 
         directionRegisterData = 0;
 
-        for(int i = 0; i < 8; i++)
+        for(int i = ENCODER_FIRST; i <= ENCODER_LAST; i++)
         {
             if(reverse[i])
             {
