@@ -152,36 +152,18 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
         public static final Register[] all = Register.values();
     }
 
-    public enum I2cRecoveryMode
-    {
-        /**
-         * Does not perform any active attempts to recover a wedged I2C bus
-         */
-        NONE(0),
-
-        /**
-         * The OctoQuad will reset its I2C peripheral if 50ms elapses between
-         * byte transmissions or between bytes and start/stop conditions
-         */
-        MODE_1_PERIPH_RST_ON_FRAME_ERR(1),
-
-        /**
-         * Mode 1 actions + the OctoQuad will toggle the clock line briefly,
-         * once, after 1500ms of no communications.
-         */
-        MODE_2_M1_PLUS_SCL_IDLE_ONESHOT_TGL(2);
-
-        public byte bVal;
-
-        I2cRecoveryMode(int bVal)
-        {
-            this.bVal = (byte) bVal;
-        }
-    }
-
     // --------------------------------------------------------------------------------------------------------------------------------
     // PUBLIC API
     //---------------------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Reads the CHIP_ID register of the OctoQuad
+     * @return the value in the CHIP_ID register of the OctoQuad
+     */
+    public byte readChipId()
+    {
+        return readRegister(Register.CHIP_ID)[0];
+    }
 
     /**
      * Class to represent an OctoQuad firmware version
@@ -205,6 +187,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
             return String.format("%d.%d.%d", maj, min, eng);
         }
     }
+
     /**
      * Get the firmware version running on the OctoQuad
      * @return the firmware version running on the OctoQuad
@@ -218,34 +201,6 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
         int eng = fw[2] & 0xFF;
 
         return new FirmwareVersion(maj, min, eng);
-    }
-
-    /**
-     * Configures the OctoQuad to use the specified I2C recovery mode.
-     * This configuration is retained across power cycles.
-     * @param mode the recovery mode to use
-     */
-    public void setI2cRecoveryModeMode(I2cRecoveryMode mode)
-    {
-        verifyInitialization();
-
-        writeContiguousRegisters(Register.COMMAND, Register.COMMAND_DAT_1, new byte[]{CMD_SET_I2C_RECOVERY_MODE, mode.bVal});
-    }
-
-    /**
-     * Run the firmware's internal reset routine
-     */
-    public void resetEverything()
-    {
-        verifyInitialization();
-
-        writeRegister(Register.COMMAND, new byte[]{CMD_RESET_EVERYTHING});
-    }
-
-    public static class EncoderDataBlock
-    {
-        public int[] counts = new int[NUM_ENCODERS];
-        public short[] velocities = new short[NUM_ENCODERS];
     }
 
     /**
@@ -302,139 +257,6 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     }
 
     /**
-     * Read a single velocity from the OctoQuad
-     * @param idx the index of the encoder to read
-     * @return the velocity for the specified encoder
-     */
-    public short readSingleVelocity(int idx)
-    {
-        verifyInitialization();
-
-        Range.throwIfRangeIsInvalid(idx, ENCODER_FIRST, ENCODER_LAST);
-
-        Register register = Register.all[Register.ENCODER_0_VELOCITY.ordinal()+idx];
-        return shortFromBytes(readRegister(register));
-    }
-
-    /**
-     * Reads all velocities from the OctoQuad, writing the data into
-     * an existing short[] object. The previous values are destroyed.
-     * @param out the short[] object to fill with new data
-     */
-    public void readAllVelocities(short[] out)
-    {
-        verifyInitialization();
-
-        if(out.length != NUM_ENCODERS)
-        {
-            throw new IllegalArgumentException("out.length != 8");
-        }
-
-        byte[] bytes = readContiguousRegisters(Register.ENCODER_0_VELOCITY, Register.ENCODER_7_VELOCITY);
-
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        buffer.order(OCTOQUAD_ENDIAN);
-
-        for(int i = 0; i < NUM_ENCODERS; i++)
-        {
-            out[i] = buffer.getShort();
-        }
-    }
-
-    /**
-     * Read a selected range of encoder velocities
-     * @param idxFirst the first encoder (inclusive)
-     * @param idxLast the last encoder (inclusive)
-     * @return an array containing the requested velocities
-     */
-    public short[] readVelocityRange(int idxFirst, int idxLast)
-    {
-        verifyInitialization();
-
-        Range.throwIfRangeIsInvalid(idxFirst, ENCODER_FIRST, ENCODER_LAST);
-        Range.throwIfRangeIsInvalid(idxLast, ENCODER_FIRST, ENCODER_LAST);
-
-        Register registerFirst = Register.all[Register.ENCODER_0_VELOCITY.ordinal()+idxFirst];
-        Register registerLast = Register.all[Register.ENCODER_0_VELOCITY.ordinal()+idxLast];
-
-        byte[] data = readContiguousRegisters(registerFirst, registerLast);
-        ByteBuffer buffer = ByteBuffer.wrap(data);
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-
-        int numVelocitiesRead = idxLast-idxFirst+1;
-        short[] velocities = new short[numVelocitiesRead];
-
-        for(int i = 0; i < numVelocitiesRead; i++)
-        {
-            velocities[i] = buffer.getShort();
-        }
-
-        return velocities;
-    }
-
-    /**
-     * Reads all velocities from the OctoQuad
-     * @return a short[] object with the new data
-     */
-    public short[] readAllVelocities()
-    {
-        verifyInitialization();
-
-        short[] block = new short[NUM_ENCODERS];
-        readAllVelocities(block);
-        return block;
-    }
-
-    /**
-     * Reads all encoder data from the OctoQuad, writing the data into
-     * an existing {@link EncoderDataBlock} object. The previous values are destroyed.
-     * @param out the {@link EncoderDataBlock} object to fill with new data
-     */
-    public void readAllEncoderData(EncoderDataBlock out)
-    {
-        verifyInitialization();
-
-        if(out.counts.length != NUM_ENCODERS)
-        {
-            throw new IllegalArgumentException("out.counts.length != 8");
-        }
-
-        if(out.velocities.length != NUM_ENCODERS)
-        {
-            throw new IllegalArgumentException("out.velocities.length != 8");
-        }
-
-        byte[] bytes = readContiguousRegisters(Register.ENCODER_0_COUNT, Register.ENCODER_7_VELOCITY);
-
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        buffer.order(OCTOQUAD_ENDIAN);
-
-        for(int i = 0; i < NUM_ENCODERS; i++)
-        {
-            out.counts[i] = buffer.getInt();
-        }
-
-        for(int i = 0; i < NUM_ENCODERS; i++)
-        {
-            out.velocities[i] = buffer.getShort();
-        }
-    }
-
-    /**
-     * Reads all encoder data from the OctoQuad
-     * @return a {@link EncoderDataBlock} object with the new data
-     */
-    public EncoderDataBlock readAllEncoderData()
-    {
-        verifyInitialization();
-
-        EncoderDataBlock block = new EncoderDataBlock();
-        readAllEncoderData(block);
-
-        return block;
-    }
-
-    /**
      * Read a selected range of encoders
      * @param idxFirst the first encoder (inclusive)
      * @param idxLast the last encoder (inclusive)
@@ -463,15 +285,6 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
         }
 
         return encoderCounts;
-    }
-
-    /**
-     * Reset all encoder counts in the OctoQuad firmware
-     */
-    public void resetAllPositions()
-    {
-        verifyInitialization();
-        writeContiguousRegisters(Register.COMMAND, Register.COMMAND_DAT_1, new byte[] {CMD_RESET_ENCODERS, (byte)0xFF});
     }
 
     /**
@@ -535,6 +348,15 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     }
 
     /**
+     * Reset all encoder counts in the OctoQuad firmware
+     */
+    public void resetAllPositions()
+    {
+        verifyInitialization();
+        writeContiguousRegisters(Register.COMMAND, Register.COMMAND_DAT_1, new byte[] {CMD_RESET_ENCODERS, (byte)0xFF});
+    }
+
+    /**
      * Set the direction for a single encoder
      * @param idx the index of the encoder
      * @param reverse direction
@@ -581,6 +403,145 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
         }
 
         writeContiguousRegisters(Register.COMMAND, Register.COMMAND_DAT_1, new byte[]{CMD_SET_DIRECTIONS, directionRegisterData});
+    }
+
+    /**
+     * Read a single velocity from the OctoQuad
+     * @param idx the index of the encoder to read
+     * @return the velocity for the specified encoder
+     */
+    public short readSingleVelocity(int idx)
+    {
+        verifyInitialization();
+
+        Range.throwIfRangeIsInvalid(idx, ENCODER_FIRST, ENCODER_LAST);
+
+        Register register = Register.all[Register.ENCODER_0_VELOCITY.ordinal()+idx];
+        return shortFromBytes(readRegister(register));
+    }
+
+    /**
+     * Reads all velocities from the OctoQuad, writing the data into
+     * an existing short[] object. The previous values are destroyed.
+     * @param out the short[] object to fill with new data
+     */
+    public void readAllVelocities(short[] out)
+    {
+        verifyInitialization();
+
+        if(out.length != NUM_ENCODERS)
+        {
+            throw new IllegalArgumentException("out.length != 8");
+        }
+
+        byte[] bytes = readContiguousRegisters(Register.ENCODER_0_VELOCITY, Register.ENCODER_7_VELOCITY);
+
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        buffer.order(OCTOQUAD_ENDIAN);
+
+        for(int i = 0; i < NUM_ENCODERS; i++)
+        {
+            out[i] = buffer.getShort();
+        }
+    }
+
+    /**
+     * Reads all velocities from the OctoQuad
+     * @return a short[] object with the new data
+     */
+    public short[] readAllVelocities()
+    {
+        verifyInitialization();
+
+        short[] block = new short[NUM_ENCODERS];
+        readAllVelocities(block);
+        return block;
+    }
+
+    /**
+     * Read a selected range of encoder velocities
+     * @param idxFirst the first encoder (inclusive)
+     * @param idxLast the last encoder (inclusive)
+     * @return an array containing the requested velocities
+     */
+    public short[] readVelocityRange(int idxFirst, int idxLast)
+    {
+        verifyInitialization();
+
+        Range.throwIfRangeIsInvalid(idxFirst, ENCODER_FIRST, ENCODER_LAST);
+        Range.throwIfRangeIsInvalid(idxLast, ENCODER_FIRST, ENCODER_LAST);
+
+        Register registerFirst = Register.all[Register.ENCODER_0_VELOCITY.ordinal()+idxFirst];
+        Register registerLast = Register.all[Register.ENCODER_0_VELOCITY.ordinal()+idxLast];
+
+        byte[] data = readContiguousRegisters(registerFirst, registerLast);
+        ByteBuffer buffer = ByteBuffer.wrap(data);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+        int numVelocitiesRead = idxLast-idxFirst+1;
+        short[] velocities = new short[numVelocitiesRead];
+
+        for(int i = 0; i < numVelocitiesRead; i++)
+        {
+            velocities[i] = buffer.getShort();
+        }
+
+        return velocities;
+    }
+
+    public static class EncoderDataBlock
+    {
+        public int[] counts = new int[NUM_ENCODERS];
+        public short[] velocities = new short[NUM_ENCODERS];
+    }
+
+    /**
+     * Reads all encoder data from the OctoQuad, writing the data into
+     * an existing {@link EncoderDataBlock} object. The previous values are destroyed.
+     * @param out the {@link EncoderDataBlock} object to fill with new data
+     */
+    public void readAllEncoderData(EncoderDataBlock out)
+    {
+        verifyInitialization();
+
+        if(out.counts.length != NUM_ENCODERS)
+        {
+            throw new IllegalArgumentException("out.counts.length != 8");
+        }
+
+        if(out.velocities.length != NUM_ENCODERS)
+        {
+            throw new IllegalArgumentException("out.velocities.length != 8");
+        }
+
+        byte[] bytes = readContiguousRegisters(Register.ENCODER_0_COUNT, Register.ENCODER_7_VELOCITY);
+
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        buffer.order(OCTOQUAD_ENDIAN);
+
+        for(int i = 0; i < NUM_ENCODERS; i++)
+        {
+            out.counts[i] = buffer.getInt();
+        }
+
+        for(int i = 0; i < NUM_ENCODERS; i++)
+        {
+            out.velocities[i] = buffer.getShort();
+        }
+    }
+
+    /**
+     * Reads all encoder data from the OctoQuad
+     * @return a {@link EncoderDataBlock} object with the new data
+     */
+    public EncoderDataBlock readAllEncoderData()
+    {
+        verifyInitialization();
+
+        EncoderDataBlock block = new EncoderDataBlock();
+        readAllEncoderData(block);
+
+        return block;
     }
 
     /**
@@ -683,13 +644,54 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     }
 
     /**
-     * Reads the CHIP_ID register of the OctoQuad
-     * @return the value in the CHIP_ID register of the OctoQuad
+     * Run the firmware's internal reset routine
      */
-    public byte readChipId()
+    public void resetEverything()
     {
-        return readRegister(Register.CHIP_ID)[0];
+        verifyInitialization();
+
+        writeRegister(Register.COMMAND, new byte[]{CMD_RESET_EVERYTHING});
     }
+
+    public enum I2cRecoveryMode
+    {
+        /**
+         * Does not perform any active attempts to recover a wedged I2C bus
+         */
+        NONE(0),
+
+        /**
+         * The OctoQuad will reset its I2C peripheral if 50ms elapses between
+         * byte transmissions or between bytes and start/stop conditions
+         */
+        MODE_1_PERIPH_RST_ON_FRAME_ERR(1),
+
+        /**
+         * Mode 1 actions + the OctoQuad will toggle the clock line briefly,
+         * once, after 1500ms of no communications.
+         */
+        MODE_2_M1_PLUS_SCL_IDLE_ONESHOT_TGL(2);
+
+        public byte bVal;
+
+        I2cRecoveryMode(int bVal)
+        {
+            this.bVal = (byte) bVal;
+        }
+    }
+
+    /**
+     * Configures the OctoQuad to use the specified I2C recovery mode.
+     * This configuration is retained across power cycles.
+     * @param mode the recovery mode to use
+     */
+    public void setI2cRecoveryModeMode(I2cRecoveryMode mode)
+    {
+        verifyInitialization();
+
+        writeContiguousRegisters(Register.COMMAND, Register.COMMAND_DAT_1, new byte[]{CMD_SET_I2C_RECOVERY_MODE, mode.bVal});
+    }
+
 
     // --------------------------------------------------------------------------------------------------------------------------------
     // INTERNAL
