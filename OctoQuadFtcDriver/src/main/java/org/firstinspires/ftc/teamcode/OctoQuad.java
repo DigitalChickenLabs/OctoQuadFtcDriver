@@ -41,6 +41,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     public static final ByteOrder OCTOQUAD_ENDIAN = ByteOrder.LITTLE_ENDIAN;
     public static final int ENCODER_FIRST = 0;
     public static final int ENCODER_LAST = 7;
+    public static final int NUM_ENCODERS = 8;
 
     private static final byte CMD_RESET_EVERYTHING = 1;
     private static final byte CMD_RESET_ENCODERS = 2;
@@ -315,18 +316,6 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
         public VelocitiesBlock velocities = new VelocitiesBlock();
     }
 
-    public static class EncoderResetCommandBlock
-    {
-        public boolean reset0;
-        public boolean reset1;
-        public boolean reset2;
-        public boolean reset3;
-        public boolean reset4;
-        public boolean reset5;
-        public boolean reset6;
-        public boolean reset7;
-    }
-
     public static class VelocitiesSampleIntervalBlock
     {
         public int intvl0_ms;
@@ -579,20 +568,21 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
      * Reset multiple encoders in the OctoQuad firmware in one command
      * @param resets the encoders to be reset
      */
-    public void resetMultipleEncoders(EncoderResetCommandBlock resets)
+    public void resetMultipleEncoders(boolean[] resets)
     {
         verifyInitialization();
 
+        if(resets.length != NUM_ENCODERS)
+        {
+            throw new IllegalArgumentException("resets.length != 8");
+        }
+
         byte dat = 0;
 
-        dat |= resets.reset0 ? (byte)(1 << 0) : 0;
-        dat |= resets.reset1 ? (byte)(1 << 1) : 0;
-        dat |= resets.reset2 ? (byte)(1 << 2) : 0;
-        dat |= resets.reset3 ? (byte)(1 << 3) : 0;
-        dat |= resets.reset4 ? (byte)(1 << 4) : 0;
-        dat |= resets.reset5 ? (byte)(1 << 5) : 0;
-        dat |= resets.reset6 ? (byte)(1 << 6) : 0;
-        dat |= resets.reset7 ? (byte)(1 << 7) : 0;
+        for(int i = ENCODER_FIRST; i <= ENCODER_LAST; i++)
+        {
+            dat |= resets[i] ? (byte)(1 << i) : 0;
+        }
 
         writeContiguousRegisters(Register.COMMAND, Register.COMMAND_DAT_1, new byte[] {CMD_RESET_ENCODERS, dat});
     }
