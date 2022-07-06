@@ -164,7 +164,7 @@ public class OctoQuadBlocks
     )
     public static void resetEncoder(int idx)
     {
-        octoQuad.resetSingleEncoder(idx);
+        octoQuad.resetSinglePosition(idx);
         cAge[idx] = 1;
         vAge[idx] = 1;
     }
@@ -179,7 +179,7 @@ public class OctoQuadBlocks
     )
     public static void resetAllEncoders()
     {
-        octoQuad.resetAllEncoders();
+        octoQuad.resetAllPositions();
         java.util.Arrays.fill(cAge, 1);
         java.util.Arrays.fill(vAge, 1);
     }
