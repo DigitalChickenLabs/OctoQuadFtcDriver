@@ -302,6 +302,15 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     }
 
     /**
+     * Reset all encoder counts in the OctoQuad firmware
+     */
+    public void resetAllPositions()
+    {
+        verifyInitialization();
+        writeContiguousRegisters(Register.COMMAND, Register.COMMAND_DAT_1, new byte[] {CMD_RESET_ENCODERS, (byte)0xFF});
+    }
+
+    /**
      * Reset multiple encoders in the OctoQuad firmware in one command
      * @param resets the encoders to be reset
      */
@@ -345,15 +354,6 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
         }
 
         writeContiguousRegisters(Register.COMMAND, Register.COMMAND_DAT_1, new byte[] {CMD_RESET_ENCODERS, dat});
-    }
-
-    /**
-     * Reset all encoder counts in the OctoQuad firmware
-     */
-    public void resetAllPositions()
-    {
-        verifyInitialization();
-        writeContiguousRegisters(Register.COMMAND, Register.COMMAND_DAT_1, new byte[] {CMD_RESET_ENCODERS, (byte)0xFF});
     }
 
     /**
