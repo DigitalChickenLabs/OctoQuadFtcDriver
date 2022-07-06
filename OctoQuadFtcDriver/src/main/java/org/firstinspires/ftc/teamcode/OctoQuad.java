@@ -46,7 +46,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     private static final byte CMD_RESET_EVERYTHING = 1;
     private static final byte CMD_RESET_ENCODERS = 2;
     private static final byte CMD_SET_DIRECTIONS = 3;
-    private static final byte CMD_SET_I2C_RESET_MODE = 4;
+    private static final byte CMD_SET_I2C_RECOVERY_MODE = 4;
 
     private byte directionRegisterData = 0;
 
@@ -152,7 +152,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
         public static final Register[] all = Register.values();
     }
 
-    public enum I2cResetMode
+    public enum I2cRecoveryMode
     {
         /**
          * Does not perform any active attempts to recover a wedged I2C bus
@@ -173,7 +173,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
 
         public byte bVal;
 
-        I2cResetMode(int bVal)
+        I2cRecoveryMode(int bVal)
         {
             this.bVal = (byte) bVal;
         }
@@ -221,15 +221,15 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     }
 
     /**
-     * Configures the OctoQuad to use the specified I2C reset mode.
+     * Configures the OctoQuad to use the specified I2C recovery mode.
      * This configuration is retained across power cycles.
-     * @param mode the reset mode to use
+     * @param mode the recovery mode to use
      */
-    public void setI2cResetMode(I2cResetMode mode)
+    public void setI2cRecoveryModeMode(I2cRecoveryMode mode)
     {
         verifyInitialization();
 
-        writeContiguousRegisters(Register.COMMAND, Register.COMMAND_DAT_1, new byte[]{CMD_SET_I2C_RESET_MODE, mode.bVal});
+        writeContiguousRegisters(Register.COMMAND, Register.COMMAND_DAT_1, new byte[]{CMD_SET_I2C_RECOVERY_MODE, mode.bVal});
     }
 
     /**
