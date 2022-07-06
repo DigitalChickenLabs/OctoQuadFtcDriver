@@ -242,78 +242,10 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
         writeRegister(Register.COMMAND, new byte[]{CMD_RESET_EVERYTHING});
     }
 
-    /**
-     * A holder class for all 8 encoder counts
-     */
-    public static class EncodersBlock
-    {
-        public int enc0;
-        public int enc1;
-        public int enc2;
-        public int enc3;
-        public int enc4;
-        public int enc5;
-        public int enc6;
-        public int enc7;
-
-        public void copyTo(EncodersBlock other)
-        {
-            other.enc0 = enc0;
-            other.enc1 = enc1;
-            other.enc2 = enc2;
-            other.enc3 = enc3;
-            other.enc4 = enc4;
-            other.enc5 = enc5;
-            other.enc6 = enc6;
-            other.enc7 = enc7;
-        }
-
-        public EncodersBlock clone()
-        {
-            EncodersBlock clone = new EncodersBlock();
-            copyTo(clone);
-            return clone;
-        }
-    }
-
-    /**
-     * A holder class for all 8 encoder velocities
-     */
-    public static class VelocitiesBlock
-    {
-        public short vel0;
-        public short vel1;
-        public short vel2;
-        public short vel3;
-        public short vel4;
-        public short vel5;
-        public short vel6;
-        public short vel7;
-
-        public void copyTo(VelocitiesBlock other)
-        {
-            other.vel0 = vel0;
-            other.vel1 = vel1;
-            other.vel2 = vel2;
-            other.vel3 = vel3;
-            other.vel4 = vel4;
-            other.vel5 = vel5;
-            other.vel6 = vel6;
-            other.vel7 = vel7;
-        }
-
-        public VelocitiesBlock clone()
-        {
-            VelocitiesBlock clone = new VelocitiesBlock();
-            copyTo(clone);
-            return clone;
-        }
-    }
-
     public static class EncoderDataBlock
     {
-        public EncodersBlock counts = new EncodersBlock();
-        public VelocitiesBlock velocities = new VelocitiesBlock();
+        public int[] counts = new int[NUM_ENCODERS];
+        public short[] velocities = new short[NUM_ENCODERS];
     }
 
     /**
@@ -333,37 +265,38 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
 
     /**
      * Reads all encoders from the OctoQuad, writing the data into
-     * an existing {@link EncodersBlock} object. The previous values are destroyed.
-     * @param out the {@link EncodersBlock} object to fill with new data
+     * an existing int[] object. The previous values are destroyed.
+     * @param out the int[] object to fill with new data
      */
-    public void readAllEncoders(EncodersBlock out)
+    public void readAllEncoders(int[] out)
     {
         verifyInitialization();
+
+        if(out.length != NUM_ENCODERS)
+        {
+            throw new IllegalArgumentException("out.length != 8");
+        }
 
         byte[] bytes = readContiguousRegisters(Register.ENCODER_0_COUNT, Register.ENCODER_7_COUNT);
 
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         buffer.order(OCTOQUAD_ENDIAN);
 
-        out.enc0 = buffer.getInt();
-        out.enc1 = buffer.getInt();
-        out.enc2 = buffer.getInt();
-        out.enc3 = buffer.getInt();
-        out.enc4 = buffer.getInt();
-        out.enc5 = buffer.getInt();
-        out.enc6 = buffer.getInt();
-        out.enc7 = buffer.getInt();
+        for(int i = 0; i < NUM_ENCODERS; i++)
+        {
+            out[i] = buffer.getInt();
+        }
     }
 
     /**
      * Reads all encoders from the OctoQuad
-     * @return an {@link EncodersBlock} object with the new data
+     * @return an int[] object with the new data
      */
-    public EncodersBlock readAllEncoders()
+    public int[] readAllEncoders()
     {
         verifyInitialization();
 
-        EncodersBlock block = new EncodersBlock();
+        int[] block = new int[NUM_ENCODERS];
         readAllEncoders(block);
         return block;
     }
@@ -385,26 +318,27 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
 
     /**
      * Reads all velocities from the OctoQuad, writing the data into
-     * an existing {@link VelocitiesBlock} object. The previous values are destroyed.
-     * @param out the {@link VelocitiesBlock} object to fill with new data
+     * an existing short[] object. The previous values are destroyed.
+     * @param out the short[] object to fill with new data
      */
-    public void readAllVelocities(VelocitiesBlock out)
+    public void readAllVelocities(short[] out)
     {
         verifyInitialization();
+
+        if(out.length != NUM_ENCODERS)
+        {
+            throw new IllegalArgumentException("out.length != 8");
+        }
 
         byte[] bytes = readContiguousRegisters(Register.ENCODER_0_VELOCITY, Register.ENCODER_7_VELOCITY);
 
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         buffer.order(OCTOQUAD_ENDIAN);
 
-        out.vel0 = buffer.getShort();
-        out.vel1 = buffer.getShort();
-        out.vel2 = buffer.getShort();
-        out.vel3 = buffer.getShort();
-        out.vel4 = buffer.getShort();
-        out.vel5 = buffer.getShort();
-        out.vel6 = buffer.getShort();
-        out.vel7 = buffer.getShort();
+        for(int i = 0; i < NUM_ENCODERS; i++)
+        {
+            out[i] = buffer.getShort();
+        }
     }
 
     /**
@@ -440,13 +374,13 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
 
     /**
      * Reads all velocities from the OctoQuad
-     * @return a {@link VelocitiesBlock} object with the new data
+     * @return a short[] object with the new data
      */
-    public VelocitiesBlock readAllVelocities()
+    public short[] readAllVelocities()
     {
         verifyInitialization();
 
-        VelocitiesBlock block = new VelocitiesBlock();
+        short[] block = new short[NUM_ENCODERS];
         readAllVelocities(block);
         return block;
     }
@@ -460,28 +394,30 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     {
         verifyInitialization();
 
+        if(out.counts.length != NUM_ENCODERS)
+        {
+            throw new IllegalArgumentException("out.counts.length != 8");
+        }
+
+        if(out.velocities.length != NUM_ENCODERS)
+        {
+            throw new IllegalArgumentException("out.velocities.length != 8");
+        }
+
         byte[] bytes = readContiguousRegisters(Register.ENCODER_0_COUNT, Register.ENCODER_7_VELOCITY);
 
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         buffer.order(OCTOQUAD_ENDIAN);
 
-        out.counts.enc0 = buffer.getInt();
-        out.counts.enc1 = buffer.getInt();
-        out.counts.enc2 = buffer.getInt();
-        out.counts.enc3 = buffer.getInt();
-        out.counts.enc4 = buffer.getInt();
-        out.counts.enc5 = buffer.getInt();
-        out.counts.enc6 = buffer.getInt();
-        out.counts.enc7 = buffer.getInt();
+        for(int i = 0; i < NUM_ENCODERS; i++)
+        {
+            out.counts[i] = buffer.getInt();
+        }
 
-        out.velocities.vel0 = buffer.getShort();
-        out.velocities.vel1 = buffer.getShort();
-        out.velocities.vel2 = buffer.getShort();
-        out.velocities.vel3 = buffer.getShort();
-        out.velocities.vel4 = buffer.getShort();
-        out.velocities.vel5 = buffer.getShort();
-        out.velocities.vel6 = buffer.getShort();
-        out.velocities.vel7 = buffer.getShort();
+        for(int i = 0; i < NUM_ENCODERS; i++)
+        {
+            out.velocities[i] = buffer.getShort();
+        }
     }
 
     /**
