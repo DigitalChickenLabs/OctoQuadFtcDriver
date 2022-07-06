@@ -27,6 +27,7 @@ import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
 import com.qualcomm.robotcore.hardware.configuration.annotations.DeviceProperties;
 import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -704,14 +705,14 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
             byte chipId = readChipId();
             if(chipId != OCTOQUAD_CHIP_ID)
             {
-                throw new OctoQuadException(String.format("OctoQuad does not report correct CHIP_ID value; got 0x%X, expect 0x%X", chipId, OCTOQUAD_CHIP_ID));
+                RobotLog.addGlobalWarningMessage("OctoQuad does not report correct CHIP_ID value; got 0x%X, expect 0x%X", chipId, OCTOQUAD_CHIP_ID);
             }
 
             FirmwareVersion fw = getFirmwareVersion();
 
             if(fw.maj != SUPPORTED_FW_VERSION_MAJ)
             {
-                throw new OctoQuadException(String.format("OctoQuad is running a different major firmware version than this driver was built for (expect %d)", SUPPORTED_FW_VERSION_MAJ));
+                RobotLog.addGlobalWarningMessage("OctoQuad is running a different major firmware version than this driver was built for (current=%d; expect=%d)", fw.maj, SUPPORTED_FW_VERSION_MAJ);
             }
 
             isInitialized = true;
