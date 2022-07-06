@@ -249,11 +249,11 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     }
 
     /**
-     * Read a single encoder from the OctoQuad
+     * Read a single position from the OctoQuad
      * @param idx the index of the encoder to read
      * @return the count for the specified encoder
      */
-    public int readSingleEncoder(int idx)
+    public int readSinglePosition(int idx)
     {
         verifyInitialization();
 
@@ -264,11 +264,11 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     }
 
     /**
-     * Reads all encoders from the OctoQuad, writing the data into
+     * Reads all positions from the OctoQuad, writing the data into
      * an existing int[] object. The previous values are destroyed.
      * @param out the int[] object to fill with new data
      */
-    public void readAllEncoders(int[] out)
+    public void readAllPositions(int[] out)
     {
         verifyInitialization();
 
@@ -289,15 +289,15 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     }
 
     /**
-     * Reads all encoders from the OctoQuad
+     * Reads all positions from the OctoQuad
      * @return an int[] object with the new data
      */
-    public int[] readAllEncoders()
+    public int[] readAllPositions()
     {
         verifyInitialization();
 
         int[] block = new int[NUM_ENCODERS];
-        readAllEncoders(block);
+        readAllPositions(block);
         return block;
     }
 
@@ -440,7 +440,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
      * @param idxLast the last encoder (inclusive)
      * @return an array containing the requested encoder counts
      */
-    public int[] readEncoderRange(int idxFirst, int idxLast)
+    public int[] readPositionRange(int idxFirst, int idxLast)
     {
         verifyInitialization();
 

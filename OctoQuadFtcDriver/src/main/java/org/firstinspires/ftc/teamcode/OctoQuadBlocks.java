@@ -190,7 +190,7 @@ public class OctoQuadBlocks
      * Get a fresh copy of ALL Encoder Counts
      */
     private static void getFreshCounts() {
-        counts = octoQuad.readEncoderRange(OctoQuad.ENCODER_FIRST, OctoQuad.ENCODER_LAST);
+        counts = octoQuad.readPositionRange(OctoQuad.ENCODER_FIRST, OctoQuad.ENCODER_LAST);
         java.util.Arrays.fill(cAge, 0);
     }
 
