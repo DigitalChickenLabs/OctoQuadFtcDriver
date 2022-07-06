@@ -547,30 +547,30 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     /**
      * Set the velocity sample interval for a single encoder
      * @param idx the index of the encoder in question
-     * @param ms the sample interval in milliseconds
+     * @param intvlms the sample interval in milliseconds
      */
-    public void setSingleVelocitySampleInterval(int idx, int ms)
+    public void setSingleVelocitySampleInterval(int idx, int intvlms)
     {
         verifyInitialization();
 
         Range.throwIfRangeIsInvalid(idx, ENCODER_FIRST, ENCODER_LAST);
-        Range.throwIfRangeIsInvalid(ms, 0, 255);
+        Range.throwIfRangeIsInvalid(intvlms, 0, 255);
 
         Register register = Register.all[Register.ENCODER_0_VELOCITY_SAMPLE_INTERVAL.ordinal()+idx];
-        writeRegister(register, new byte[] {(byte)ms});
+        writeRegister(register, new byte[] {(byte)intvlms});
     }
 
     /**
      * Set the velocity sample interval for all encoders
-     * @param ms the sample interval in milliseconds
+     * @param intvlms the sample interval in milliseconds
      */
-    public void setAllVelocitySampleIntervals(int ms)
+    public void setAllVelocitySampleIntervals(int intvlms)
     {
         verifyInitialization();
 
-        Range.throwIfRangeIsInvalid(ms, 0, 255);
+        Range.throwIfRangeIsInvalid(intvlms, 0, 255);
 
-        byte intvl = (byte) ms;
+        byte intvl = (byte) intvlms;
         byte[] dat = new byte[] {intvl, intvl, intvl, intvl, intvl, intvl, intvl, intvl};
 
         writeContiguousRegisters(Register.ENCODER_0_VELOCITY_SAMPLE_INTERVAL, Register.ENCODER_7_VELOCITY_SAMPLE_INTERVAL, dat);
@@ -578,27 +578,27 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
 
     /**
      * Set the velocity sample intervals for all encoders
-     * @param intvls the sample intervals in milliseconds
+     * @param intvlms the sample intervals in milliseconds
      */
-    public void setAllVelocitySampleIntervals(int[] intvls)
+    public void setAllVelocitySampleIntervals(int[] intvlms)
     {
         verifyInitialization();
 
-        if(intvls.length != NUM_ENCODERS)
+        if(intvlms.length != NUM_ENCODERS)
         {
             throw new IllegalArgumentException("intvls.length != 8");
         }
 
-        for(int i : intvls)
+        for(int i : intvlms)
         {
             Range.throwIfRangeIsInvalid(i, 0, 255);
         }
 
-        byte[] dat = new byte[intvls.length];
+        byte[] dat = new byte[intvlms.length];
 
-        for(int i = 0; i < intvls.length; i++)
+        for(int i = 0; i < intvlms.length; i++)
         {
-            dat[i] = (byte) intvls[i];
+            dat[i] = (byte) intvlms[i];
         }
 
         writeContiguousRegisters(Register.ENCODER_0_VELOCITY_SAMPLE_INTERVAL, Register.ENCODER_7_VELOCITY_SAMPLE_INTERVAL, dat);
