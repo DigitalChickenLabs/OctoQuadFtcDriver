@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 ext {
     PUBLISH_GROUP_ID = 'io.github.digitalchickenlabs'
     PUBLISH_ARTIFACT_ID = 'octoquad-ftc'
-    PUBLISH_VERSION = '1.0-B'
+    PUBLISH_VERSION = '1.0-C'
 }
 
 android {
@@ -13,7 +13,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 23
         versionCode 1
-        versionName "1.0-B"
+        versionName "1.0-C"
     }
 
     buildTypes {

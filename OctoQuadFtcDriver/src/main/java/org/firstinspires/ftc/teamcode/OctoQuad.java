@@ -492,7 +492,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
 
     public static class EncoderDataBlock
     {
-        public int[] counts = new int[NUM_ENCODERS];
+        public int[] positions = new int[NUM_ENCODERS];
         public short[] velocities = new short[NUM_ENCODERS];
     }
 
@@ -505,7 +505,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     {
         verifyInitialization();
 
-        if(out.counts.length != NUM_ENCODERS)
+        if(out.positions.length != NUM_ENCODERS)
         {
             throw new IllegalArgumentException("out.counts.length != 8");
         }
@@ -522,7 +522,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
 
         for(int i = 0; i < NUM_ENCODERS; i++)
         {
-            out.counts[i] = buffer.getInt();
+            out.positions[i] = buffer.getInt();
         }
 
         for(int i = 0; i < NUM_ENCODERS; i++)
