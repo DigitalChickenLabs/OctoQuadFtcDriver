@@ -91,8 +91,7 @@ public class OctoQuadBlocks extends OctoQuad
                     "Pass the desired channel number to the block.  " +
                     "Valid values are 0 to 7." +
                     " The direction is inverted if the 'reverse' input is set to 'true'.",
-            tooltip = "Reverse the count-direction of selected encoder (0-7)",
-            parameterDefaultValues = {"0", "true"}
+            tooltip = "Reverse the count-direction of selected encoder (0-7)"
 
     )
     public void reverseEncoderDirection(int idx, boolean invert)
@@ -112,8 +111,7 @@ public class OctoQuadBlocks extends OctoQuad
                     "Encoder steps are counted every 'Velocity Interval' and reported as 'Velocity'. " +
                     "Since the max velocity is clipped at +/-32767 you can reduce the Sample Interval to prevent overflow.  " +
                     "This is only needed if you have an extremely high pulse rate.  The range of values is 1 - 255.",
-            tooltip = "Set the interval over which pulses are counted to determine velocity. (1-255 mSec)",
-            parameterDefaultValues = {"50"}
+            tooltip = "Set the interval over which pulses are counted to determine velocity. (1-255 mSec)"
 
     )
     public void setVelocityInterval(int ms)
