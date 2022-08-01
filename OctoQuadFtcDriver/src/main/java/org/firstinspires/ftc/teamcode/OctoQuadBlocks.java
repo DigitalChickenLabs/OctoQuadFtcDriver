@@ -91,7 +91,8 @@ public class OctoQuadBlocks extends OctoQuad
                     "Pass the desired channel number to the block.  " +
                     "Valid values are 0 to 7." +
                     " The direction is inverted if the 'reverse' input is set to 'true'.",
-            tooltip = "Reverse the count-direction of selected encoder (0-7)"
+            tooltip = "Reverse the count-direction of selected encoder (0-7)",
+            parameterDefaultValues = {"0", "true"}
 
     )
     public void reverseEncoderDirection(int idx, boolean invert)
@@ -111,7 +112,9 @@ public class OctoQuadBlocks extends OctoQuad
                     "Encoder steps are counted every 'Velocity Interval' and reported as 'Velocity'. " +
                     "Since the max velocity is clipped at +/-32767 you can reduce the Sample Interval to prevent overflow.  " +
                     "This is only needed if you have an extremely high pulse rate.  The range of values is 1 - 255.",
-            tooltip = "Set the interval over which pulses are counted to determine velocity. (1-255 mSec)"
+            tooltip = "Set the interval over which pulses are counted to determine velocity. (1-255 mSec)",
+            parameterDefaultValues = {"50"}
+
     )
     public void setVelocityInterval(int ms)
     {
@@ -127,7 +130,7 @@ public class OctoQuadBlocks extends OctoQuad
             comment = "Reset the position of the selected encoder to zero." +
                     "Pass the desired channel number to the block.  " +
                     "Valid values are 0 to 7.",
-            tooltip = "Reset the selected encoder position to zero. (0-7)"
+            tooltip = "Reset the selected encoder position to zero. (0-7)" 
     )
     public void resetEncoder(int idx)
     {
@@ -142,7 +145,7 @@ public class OctoQuadBlocks extends OctoQuad
     @ExportToBlocks(
             color=60, heading="OctoQuad",
             comment = "Reset the position of all encoders to zero.",
-            tooltip = "Reset all encoders to zero. (0-7)"
+            tooltip = "Reset all encoders to zero."
     )
     public void resetAllEncoders()
     {
@@ -150,7 +153,6 @@ public class OctoQuadBlocks extends OctoQuad
         java.util.Arrays.fill(pAge, 0);
         java.util.Arrays.fill(vAge, 0);
     }
-
 
     /***
      * Get a fresh copy of ALL Encoder Counts
