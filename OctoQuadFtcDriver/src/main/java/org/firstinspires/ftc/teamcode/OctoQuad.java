@@ -32,8 +32,6 @@ import com.qualcomm.robotcore.util.RobotLog;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-@I2cDeviceType
-@DeviceProperties(xmlTag = "OctoQuad", name = "OctoQuad")
 public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
 {
     public static final int I2C_ADDRESS = 0x30;
