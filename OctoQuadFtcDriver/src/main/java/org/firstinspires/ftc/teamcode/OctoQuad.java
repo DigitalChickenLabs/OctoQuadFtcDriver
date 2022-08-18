@@ -170,7 +170,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
      * Reads the CHIP_ID register of the OctoQuad
      * @return the value in the CHIP_ID register of the OctoQuad
      */
-    public byte readChipId()
+    public byte getChipId()
     {
         return readRegister(Register.CHIP_ID)[0];
     }
@@ -377,7 +377,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     /**
      * Set the direction for a single encoder
      * This parameter will NOT be retained across power cycles, unless
-     * you call {@link #writeCurrentParametersToFlash()}
+     * you call {@link #saveParametersToFlash()} ()}
      * @param idx the index of the encoder
      * @param reverse direction
      */
@@ -419,7 +419,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     /**
      * Set the direction for all encoders
      * This parameter will NOT be retained across power cycles, unless
-     * you call {@link #writeCurrentParametersToFlash()}
+     * you call {@link #saveParametersToFlash()} ()}
      * @param reverse 8-length direction array
      */
     public void setAllEncoderDirections(boolean[] reverse)
@@ -594,7 +594,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     /**
      * Set the velocity sample interval for a single encoder
      * This parameter will NOT be retained across power cycles, unless
-     * you call {@link #writeCurrentParametersToFlash()}
+     * you call {@link #saveParametersToFlash()} ()}
      * @param idx the index of the encoder in question
      * @param intvlms the sample interval in milliseconds
      */
@@ -611,7 +611,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     /**
      * Set the velocity sample interval for all encoders
      * This parameter will NOT be retained across power cycles, unless
-     * you call {@link #writeCurrentParametersToFlash()}
+     * you call {@link #saveParametersToFlash()} ()}
      * @param intvlms the sample interval in milliseconds
      */
     public void setAllVelocitySampleIntervals(int intvlms)
@@ -629,7 +629,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     /**
      * Set the velocity sample intervals for all encoders
      * This parameter will NOT be retained across power cycles, unless
-     * you call {@link #writeCurrentParametersToFlash()}
+     * you call {@link #saveParametersToFlash()} ()}
      * @param intvlms the sample intervals in milliseconds
      */
     public void setAllVelocitySampleIntervals(int[] intvlms)
@@ -657,7 +657,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
      * @param idx the index of the encoder in question
      * @return the velocity sample interval
      */
-    public int readSingleVelocitySampleInterval(int idx)
+    public int getSingleVelocitySampleInterval(int idx)
     {
         verifyInitialization();
 
@@ -672,7 +672,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
      * Reads all velocity sample intervals from the OctoQuad
      * @return all velocity sample intervals from the OctoQuad
      */
-    public int[] readAllVelocitySampleIntervals()
+    public int[] getAllVelocitySampleIntervals()
     {
         verifyInitialization();
 
@@ -731,7 +731,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
      * @param idx the channel in question
      * @return minimum/maximum pulse width
      */
-    public ChannelPulseWidthParams readSingleChannelPulseWidthParams(int idx)
+    public ChannelPulseWidthParams getSingleChannelPulseWidthParams(int idx)
     {
         verifyInitialization();
 
@@ -789,7 +789,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     /**
      * Configures the OctoQuad's channel banks
      * This parameter will NOT be retained across power cycles, unless
-     * you call {@link #writeCurrentParametersToFlash()}
+     * you call {@link #saveParametersToFlash()} ()}
      * @param config the channel bank configuration to use
      */
     public void setChannelBankConfig(ChannelBankConfig config)
@@ -851,7 +851,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     /**
      * Configures the OctoQuad to use the specified I2C recovery mode.
      * This parameter will NOT be retained across power cycles, unless
-     * you call {@link #writeCurrentParametersToFlash()}
+     * you call {@link #saveParametersToFlash()} ()}
      * @param mode the recovery mode to use
      */
     public void setI2cRecoveryMode(I2cRecoveryMode mode)
@@ -886,7 +886,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     /**
      * Stores the current state of parameters to flash, to be applied at next boot
      */
-    public void writeCurrentParametersToFlash()
+    public void saveParametersToFlash()
     {
         verifyInitialization();
 
@@ -910,7 +910,7 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     {
         if(!isInitialized)
         {
-            byte chipId = readChipId();
+            byte chipId = getChipId();
             if(chipId != OCTOQUAD_CHIP_ID)
             {
                 RobotLog.addGlobalWarningMessage("OctoQuad does not report correct CHIP_ID value; got 0x%X, expect 0x%X", chipId, OCTOQUAD_CHIP_ID);
