@@ -24,8 +24,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
-import com.qualcomm.robotcore.hardware.configuration.annotations.DeviceProperties;
-import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -692,12 +690,21 @@ public class OctoQuad extends I2cDeviceSynchDevice<I2cDeviceSynch>
     {
         public int min_length_us;
         public int max_length_us;
+
+        public ChannelPulseWidthParams() {};
+
+        public ChannelPulseWidthParams(int min_length_us, int max_length_us) {
+            this.min_length_us = min_length_us;
+            this.max_length_us = max_length_us;
+        }
     }
 
     /**
      * Configure the minimum/maximum pulse width reported by an absolute encoder
      * which is connected to a given channel, to allow the ability to provide
-     * sane velocity data.
+     * accurate velocity data.
+     * These parameters will NOT be retained across power cycles, unless
+     * you call {@link #saveParametersToFlash()} ()}
      * @param idx the channel in question
      * @param params minimum/maximum pulse width
      */

@@ -28,7 +28,7 @@ public class OctoQuadBlocks extends OctoQuad
      */
     @ExportToBlocks(
             color=60, heading="OctoQuad",
-            comment = "Read the Firmware Revision number from an OctoQuad and returns it as text.",
+            comment = "Get the Firmware Revision number from an OctoQuad and returns it as text.",
             tooltip = "Get OctoQuad Firmware Version as text"
     )
     public String version()
@@ -78,45 +78,6 @@ public class OctoQuadBlocks extends OctoQuad
             refreshVelocities();
         }
         return velocities[idx];
-    }
-
-    /***
-     * Set an encoder to reverse it's direction
-     * invert = true means invert
-     */
-    @ExportToBlocks(
-            parameterLabels = {"encoder (0-7)", "reverse"},
-            color=60, heading="OctoQuad",
-            comment = "Reverse the count-direction of an encoder being read by an OctoQuad interface module." +
-                    "Pass the desired channel number to the block.  " +
-                    "Valid values are 0 to 7." +
-                    " The direction is inverted if the 'reverse' input is set to 'true'.",
-            tooltip = "Reverse the count-direction of selected encoder (0-7)"
-
-    )
-    public void reverseEncoderDirection(int idx, boolean invert)
-    {
-        setSingleEncoderDirection(idx, invert);
-    }
-
-
-    /***
-     * set the velocity count interval for ALL encoders
-     * Interval is set in mSec  Valid values 1-255. Default is 50mS
-     */
-    @ExportToBlocks(parameterLabels = {"interval (mS)"},
-            color=60, heading="OctoQuad",
-            comment = "Sets the Velocity Sample Interval for all encoders connected to an OctoQuad. (Advanced)  " +
-                    "This interval is when when measuring encoder velocity, and the default is 50 mSec.  " +
-                    "Encoder steps are counted every 'Velocity Interval' and reported as 'Velocity'. " +
-                    "Since the max velocity is clipped at +/-32767 you can reduce the Sample Interval to prevent overflow.  " +
-                    "This is only needed if you have an extremely high pulse rate.  The range of values is 1 - 255.",
-            tooltip = "Set the interval over which pulses are counted to determine velocity. (1-255 mSec)"
-
-    )
-    public void setVelocityInterval(int ms)
-    {
-        setAllVelocitySampleIntervals(ms);
     }
 
     /***
@@ -177,4 +138,110 @@ public class OctoQuadBlocks extends OctoQuad
         velocities = readVelocityRange(ENCODER_FIRST, ENCODER_LAST);
         java.util.Arrays.fill(vAge, 1);
     }
+
+    // ===========================================================================================================
+    // The following blocks set OctoQuad parameters that can be made the "defaults" by saving them in FLASH storage
+    // ===========================================================================================================
+
+    /***
+     * Save all current encoder parameters to FLASH
+     */
+    @ExportToBlocks(
+            color=60, heading="OctoQuad",
+            comment = "Save all current encoder parameters to FLASH memory, for automatic recall on next startup.",
+            tooltip = "Save Params to FLASH"
+    )
+    public void saveParametersToFlash()
+    {
+        saveParametersToFlash();
+    }
+
+
+    /***
+     * Configure OctoQuad encoder banks.
+     * The OctoQuad has two banks of 4 encoders (bank 1 and bank2)
+     * Each bank can be either 4 Quadrature encoders, or 4 Absolute Pulse Width encoders
+     * Bank assignments cab be :
+     * 0 = Bank 1 & 2 Both Quadrature Encoders
+     * 1 = Bank 1 & 2 Both Pulse Width Encoders
+     * 2 = Bank 1 Quad,  Bank 2 Pulse Width
+     */
+    @ExportToBlocks(
+            parameterLabels = {"Bank Config (0,1 or 2)"},
+            color=60, heading="OctoQuad",
+            comment = "Configure Encoder banks.  " +
+                    "The OctoQuad has two banks of 4 encoders (bank 1 and bank2).  " +
+                    "Each bank can be either 4 Quadrature encoders, or 4 Absolute Pulse Width encoders.  " +
+                    "Bank Config can be: " +
+                    "0 = Bank 1 & 2 Both Quadrature Encoders.  " +
+                    "1 = Bank 1 & 2 Both Pulse Width Encoders.  " +
+                    "2 = Bank 1 Quad,  Bank 2 Pulse Width.  ",
+            tooltip = "Assign what type of encoders are connected"
+    )
+    public void setBankMode(int mode)
+    {
+        ChannelBankConfig commands[] = {ChannelBankConfig.ALL_QUADRATURE,
+                ChannelBankConfig.ALL_PULSE_WIDTH,
+                ChannelBankConfig.BANK1_QUADRATURE_BANK2_PULSE_WIDTH};
+        setChannelBankConfig(commands[mode]) ;
+    }
+
+    /***
+     * Set an encoder's direction to reverse (or not)
+     * invert = true means invert
+     */
+    @ExportToBlocks(
+            parameterLabels = {"encoder (0-7)", "reverse"},
+            color=60, heading="OctoQuad",
+            comment = "Reverse the count-direction of an encoder being read by an OctoQuad interface module." +
+                    "Pass the desired channel number to the block.  " +
+                    "Valid values are 0 to 7." +
+                    " The direction is inverted if the 'reverse' input is set to 'true'.",
+            tooltip = "Reverse the count-direction of selected encoder (0-7)"
+
+    )
+    public void reverseEncoderDirection(int idx, boolean invert)
+    {
+        setSingleEncoderDirection(idx, invert);
+    }
+
+    /***
+     * set the velocity count interval for ALL encoders
+     * Interval is set in mSec  Valid values 1-255. Default is 50mS
+     */
+    @ExportToBlocks(parameterLabels = {"interval (mS)"},
+            color=60, heading="OctoQuad",
+            comment = "Sets the Velocity Sample Interval for all encoders connected to an OctoQuad. (Advanced)  " +
+                    "This interval is when when measuring encoder velocity, and the default is 50 mSec.  " +
+                    "Encoder steps are counted every 'Velocity Interval' and reported as 'Velocity'. " +
+                    "Since the max velocity is clipped at +/-32767 you can reduce the Sample Interval to prevent overflow.  " +
+                    "This is only needed if you have an extremely high pulse rate.  The range of values is 1 - 255.",
+            tooltip = "Set the interval over which pulses are counted to determine velocity. (1-255 mSec)"
+
+    )
+    public void setVelocityInterval(int ms)
+    {
+        setAllVelocitySampleIntervals(ms);
+    }
+
+
+    /***
+     * Set Absolute Encoder Pulse Width Range.
+     * The Min and Max pulse Width corresponds to 0-360 deg rotation
+     * This only applies to Absolute Position Pulse Width Encoders, and is
+     * only required if you will be using the encoder Velocity.
+     */
+    @ExportToBlocks(
+            parameterLabels = {"Encoder (0-7)", "Min Pulse (uSec)", "Max Pulse (uSec)"},
+            color=60, heading="OctoQuad",
+            comment = "Define the pulse width range for an Abs Encoder (default 1,1024)",
+            tooltip = "Set Abs Encoder Pulse Width in uSec."
+    )
+    public void setPulseWidths(int encoder, int minPulse, int maxPulse)
+    {
+        ChannelPulseWidthParams param = new ChannelPulseWidthParams(minPulse, maxPulse);
+        setSingleChannelPulseWidthParams(encoder, param);
+    }
+
+
 }
