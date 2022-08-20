@@ -144,14 +144,14 @@ public class OctoQuadBlocks extends OctoQuad
     // ===========================================================================================================
 
     /***
-     * Save all current encoder parameters to FLASH
+     * Save all current OctoQuad settings to FLASH
      */
     @ExportToBlocks(
             color=60, heading="OctoQuad",
-            comment = "Save all current encoder parameters to FLASH memory, for automatic recall on next startup.",
+            comment = "Save all current Octoquad settings to FLASH memory, for automatic recall on next startup.",
             tooltip = "Save Params to FLASH"
     )
-    public void saveParametersToFlash()
+    public void saveSettingsToFlash()
     {
         saveParametersToFlash();
     }
