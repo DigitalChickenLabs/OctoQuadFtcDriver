@@ -167,7 +167,7 @@ public class OctoQuadBlocks extends OctoQuad
      * 2 = Bank 1 Quad,  Bank 2 Pulse Width
      */
     @ExportToBlocks(
-            parameterLabels = {"Bank Config (0,1 or 2)"},
+            parameterLabels = {"Bank Mode (0,1 or 2)"},
             color=60, heading="OctoQuad",
             comment = "Configure Encoder banks.  " +
                     "The OctoQuad has two banks of 4 encoders (bank 1 and bank2).  " +
@@ -209,7 +209,7 @@ public class OctoQuadBlocks extends OctoQuad
      * set the velocity count interval for ALL encoders
      * Interval is set in mSec  Valid values 1-255. Default is 50mS
      */
-    @ExportToBlocks(parameterLabels = {"interval (mS)"},
+    @ExportToBlocks(parameterLabels = {"interval (mSec)"},
             color=60, heading="OctoQuad",
             comment = "Sets the Velocity Sample Interval for all encoders connected to an OctoQuad. (Advanced)  " +
                     "This interval is when when measuring encoder velocity, and the default is 50 mSec.  " +
