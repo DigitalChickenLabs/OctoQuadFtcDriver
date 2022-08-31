@@ -172,7 +172,7 @@ public class OctoQuadBlocks extends OctoQuad
             comment = "Configure Encoder banks.  " +
                     "The OctoQuad has two banks of 4 encoders (bank 1 and bank2).  " +
                     "Each bank can be either 4 Quadrature encoders, or 4 Absolute Pulse Width encoders.  " +
-                    "Bank Config can be: " +
+                    "Bank Mode values can be: " +
                     "0 = Bank 1 & 2 Both Quadrature Encoders.  " +
                     "1 = Bank 1 & 2 Both Pulse Width Encoders.  " +
                     "2 = Bank 1 Quad,  Bank 2 Pulse Width.  ",
