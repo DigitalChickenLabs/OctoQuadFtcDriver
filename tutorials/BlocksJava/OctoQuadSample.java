@@ -38,16 +38,15 @@ public class OctoQuadSample extends LinearOpMode {
     octoquad.reverseEncoderDirection(1, false);
 
     waitForStart();
-    
+
+    telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
     while (opModeIsActive()) {
-      telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
       telemetry.addData(">", "Press X to Reset Encoders");
     
       // Use left stick to drive and right stick to turn (POV mode)
       // The Y axis of a joystick ranges from -1 in its top-most position
       // to +1 in its bottom-most position. We negate this value so that
       // the topmost position corresponds to maximum forward power.
-    
       left_drive.setPower(-gamepad1.left_stick_y + gamepad1.right_stick_x);
       right_drive.setPower(-gamepad1.left_stick_y - gamepad1.right_stick_x);
     
@@ -58,8 +57,8 @@ public class OctoQuadSample extends LinearOpMode {
       }
     
       // Read the position of an encoder connected to an OctoQuad.
-      telemetry.addData("Left  Pwr / Pos", "%.2f / %.2f",left_drive.getPower(), octoquad.getPosition(0));
-      telemetry.addData("Right Pwr / Pos", "%.2f / %.2f", right_drive.getPower(), octoquad.getPosition(1));
+      telemetry.addData("Left  Pwr / Pos", "%5.2f / %d",left_drive.getPower(), octoquad.getPosition(0));
+      telemetry.addData("Right Pwr / Pos", "%5.2f / %d", right_drive.getPower(), octoquad.getPosition(1));
       telemetry.update();
     }
   }

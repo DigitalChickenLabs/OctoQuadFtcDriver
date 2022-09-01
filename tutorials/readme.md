@@ -24,21 +24,21 @@ The OctoQuad may be evaluated using any of the three standard FTC programming me
 
 Each method is described below, and all referenced code can be within this repository.
 
-### **Blocks and OnBotJava** [go now!](/BlocksJava/)
+### **Blocks and OnBotJava** [go now!](BlocksJava/)
 
 An external library has been created to work with both Blocks and OnBotJava in a similar way.  The library is transferred  to the Robot Controller using the standard OnBotJava upload feature.  Once built, the OctoQuad driver is available for Blocks or OnBotJava programs to use, and an OctoQuad can be added to an I2C port on the Control Hub or Expansion Hub.
 
 In addition to the external library, two sample OpModes are also provided.  One is for Blocks and one is for OnBotJava.  These may be uploaded in the standard way for each platform.  These examples assume a configured OctoQuad device named "octoquad".
 
-To step through the upload procedure and sample OpModes, visit the  [Blocks Java](/BlocksJava/) folder.
+To step through the upload procedure and sample OpModes, visit the  [Blocks Java](BlocksJava/) folder.
 
-### **Android Studio Java** [go now!](/ASJava/)
+### **Android Studio Java** [go now!](ASJava/)
 
 To evaluate the OctoQuad using Android Studio, you can simply add a dependancy to the external library, OR if you want to access the underlying code, you can add the source files to your project, and all the driver methods will be available to your OpModes.
 
 A more fully featured sample program is also provided for Android Studio.  This sample illustrates selecting the high speed I2C mode for lower latency, and reading pulse width Absolute Position encoders like the REV Trhough Bore Encoder.
 
-To review the driver and sample OpMode, visit the [Android Studio Java](/ASJava/) folder.
+To review the driver and sample OpMode, visit the [Android Studio Java](ASJava/) folder.
 
 ### How do hook up the OctoQuad?
 
@@ -73,4 +73,4 @@ The LED will blink rapidly (7Hz) if there is currently in-flight traffic on the 
 
 The LED will blink slowly (1Hz) if there has been traffic on the active interface since power-up, but there has not been any traffic within the past 1000ms
 
-*Updated: 8/30/2022*
+*Updated: 9/1/2022*
