@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 ext {
     PUBLISH_GROUP_ID = 'io.github.digitalchickenlabs'
     PUBLISH_ARTIFACT_ID = 'octoquad-ftc'
-    PUBLISH_VERSION = '1.0-C'
+    PUBLISH_VERSION = '2.0-A'
 }
 
 android {
@@ -13,7 +13,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 23
         versionCode 1
-        versionName "1.0-C"
+        versionName "2.0-A"
     }
 
     buildTypes {
@@ -45,7 +45,7 @@ android {
 
 dependencies {
     //compileOnly fileTree(include: ['*.aar'], dir: '../libs')
-    compileOnly 'org.firstinspires.ftc:RobotCore:7.1.0'
+    compileOnly 'org.firstinspires.ftc:RobotCore:7.2.0'
 }
 
 apply from: '../sonatype-publish.gradle'
